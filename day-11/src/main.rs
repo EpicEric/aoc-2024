@@ -66,7 +66,7 @@ fn part2() {
         stone_map = new_stone_map;
     }
     println!(
-        "After blinking 25 times, we have {} stones",
+        "After blinking 75 times, we have {} stones",
         stone_map.values().sum::<usize>()
     );
 }
