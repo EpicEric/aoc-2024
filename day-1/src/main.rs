@@ -16,7 +16,7 @@ fn part_1() {
     list_2.sort();
     let result: usize = list_1
         .into_iter()
-        .zip(list_2.into_iter())
+        .zip(list_2)
         .map(|(first, second)| first.abs_diff(second))
         .sum();
     println!("The total distance is {result}");

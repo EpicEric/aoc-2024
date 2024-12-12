@@ -85,18 +85,15 @@ enum Node {
 
 fn part2() {
     let mut memory: Vec<Node> = Vec::new();
-    let mut chars: Vec<u32> = INPUT
-        .chars()
-        .filter_map(|char| char.to_digit(10).map(|digit| digit))
-        .collect();
+    let mut chars: Vec<u32> = INPUT.chars().filter_map(|char| char.to_digit(10)).collect();
     if chars.len() % 2 == 0 {
         chars.pop();
     }
 
     let mut id = 0usize;
-    let mut iter = chars.into_iter();
+    let iter = chars.into_iter();
     let mut is_file = true;
-    while let Some(size) = iter.next() {
+    for size in iter {
         if is_file {
             if size > 0 {
                 memory.push(Node::File { id, size });
@@ -171,11 +168,10 @@ fn part2() {
     // println!("{:?}", &memory);
     let checksum: usize = memory
         .iter()
-        .map(|node| match node {
+        .flat_map(|node| match node {
             Node::File { id, size } => iter::repeat_n(*id, *size as usize),
             Node::Span { size } => iter::repeat_n(0, *size as usize),
         })
-        .flatten()
         .enumerate()
         .map(|(a, b)| a * b)
         .sum();

@@ -2,24 +2,24 @@ static INPUT: &str = include_str!("./input.txt");
 
 fn has_valid_equation(result: usize, operands: &[usize], stack: Option<usize>) -> bool {
     match (operands, stack) {
-        (&[], _) => return result == 0,
-        (&[last], None) => return result == last,
-        (&[last], Some(factor)) => return result == last + factor || result == last * factor,
+        (&[], _) => result == 0,
+        (&[last], None) => result == last,
+        (&[last], Some(factor)) => result == last + factor || result == last * factor,
         ([next, remainder @ ..], None) => {
             if *next > result {
-                return false;
+                false
+            } else {
+                has_valid_equation(result, remainder, Some(*next))
             }
-            return has_valid_equation(result, &remainder, Some(*next));
         }
         ([next, remainder @ ..], Some(factor)) => {
             if next + factor > result {
-                return false;
-            }
-            if next * factor > result {
-                return has_valid_equation(result, &remainder, Some(next + factor));
+                false
+            } else if next * factor > result {
+                has_valid_equation(result, remainder, Some(next + factor))
             } else {
-                return has_valid_equation(result, &remainder, Some(next + factor))
-                    || has_valid_equation(result, &remainder, Some(next * factor));
+                has_valid_equation(result, remainder, Some(next + factor))
+                    || has_valid_equation(result, remainder, Some(next * factor))
             }
         }
     }
@@ -31,66 +31,63 @@ fn has_valid_equation_with_concatenation(
     stack: Option<usize>,
 ) -> bool {
     match (operands, stack) {
-        (&[], _) => return result == 0,
-        (&[last], None) => return result == last,
+        (&[], _) => result == 0,
+        (&[last], None) => result == last,
         (&[last], Some(factor)) => {
-            return result == last + factor
+            result == last + factor
                 || result == last * factor
                 || result == format!("{}{}", factor, last).parse().unwrap()
         }
         ([next, remainder @ ..], None) => {
             if *next > result {
-                return false;
+                false
+            } else {
+                has_valid_equation_with_concatenation(result, remainder, Some(*next))
             }
-            return has_valid_equation_with_concatenation(result, &remainder, Some(*next));
         }
         ([next, remainder @ ..], Some(factor)) => {
             if next + factor > result {
-                return false;
-            }
-            let concatenated = format!("{}{}", factor, next).parse().unwrap();
-            if next * factor > result {
-                if concatenated > result {
-                    return has_valid_equation_with_concatenation(
-                        result,
-                        &remainder,
-                        Some(next + factor),
-                    );
-                } else {
-                    return has_valid_equation_with_concatenation(
-                        result,
-                        &remainder,
-                        Some(next + factor),
-                    ) || has_valid_equation_with_concatenation(
-                        result,
-                        &remainder,
-                        Some(concatenated),
-                    );
-                }
-            } else if concatenated > result {
-                return has_valid_equation_with_concatenation(
-                    result,
-                    &remainder,
-                    Some(next + factor),
-                ) || has_valid_equation_with_concatenation(
-                    result,
-                    &remainder,
-                    Some(next * factor),
-                );
+                false
             } else {
-                return has_valid_equation_with_concatenation(
-                    result,
-                    &remainder,
-                    Some(next + factor),
-                ) || has_valid_equation_with_concatenation(
-                    result,
-                    &remainder,
-                    Some(next * factor),
-                ) || has_valid_equation_with_concatenation(
-                    result,
-                    &remainder,
-                    Some(concatenated),
-                );
+                let concatenated = format!("{}{}", factor, next).parse().unwrap();
+                if next * factor > result {
+                    if concatenated > result {
+                        has_valid_equation_with_concatenation(
+                            result,
+                            remainder,
+                            Some(next + factor),
+                        )
+                    } else {
+                        has_valid_equation_with_concatenation(
+                            result,
+                            remainder,
+                            Some(next + factor),
+                        ) || has_valid_equation_with_concatenation(
+                            result,
+                            remainder,
+                            Some(concatenated),
+                        )
+                    }
+                } else if concatenated > result {
+                    has_valid_equation_with_concatenation(result, remainder, Some(next + factor))
+                        || has_valid_equation_with_concatenation(
+                            result,
+                            remainder,
+                            Some(next * factor),
+                        )
+                } else {
+                    has_valid_equation_with_concatenation(result, remainder, Some(next + factor))
+                        || has_valid_equation_with_concatenation(
+                            result,
+                            remainder,
+                            Some(next * factor),
+                        )
+                        || has_valid_equation_with_concatenation(
+                            result,
+                            remainder,
+                            Some(concatenated),
+                        )
+                }
             }
         }
     }

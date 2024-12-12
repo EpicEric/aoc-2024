@@ -28,27 +28,27 @@ impl Eq for Page<'_> {}
 
 impl Ord for Page<'_> {
     fn cmp(&self, other: &Self) -> Ordering {
-        self.partial_cmp(other).unwrap()
-    }
-}
-
-impl PartialOrd for Page<'_> {
-    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
         if self
             .rulebook
             .get(&self.value)
             .is_some_and(|rules| rules.contains(&other.value))
         {
-            return Some(Ordering::Less);
+            return Ordering::Less;
         }
         if self
             .rulebook
             .get(&other.value)
             .is_some_and(|rules| rules.contains(&self.value))
         {
-            return Some(Ordering::Greater);
+            return Ordering::Greater;
         }
-        Some(Ordering::Equal)
+        Ordering::Equal
+    }
+}
+
+impl PartialOrd for Page<'_> {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        Some(self.cmp(other))
     }
 }
 

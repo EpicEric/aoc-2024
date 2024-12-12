@@ -2,7 +2,7 @@ use std::collections::{HashMap, HashSet};
 
 static INPUT: &str = include_str!("./input.txt");
 
-fn find_neighbors(map: &Vec<Vec<u8>>, position: (usize, usize), value: u8) -> Vec<(usize, usize)> {
+fn find_neighbors(map: &[Vec<u8>], position: (usize, usize), value: u8) -> Vec<(usize, usize)> {
     let mut neighbors = vec![];
     // Up
     if position.1 > 0
@@ -50,16 +50,12 @@ fn part1() {
                 .collect()
         })
         .collect();
-    let trailheads = map
-        .iter()
-        .enumerate()
-        .map(|(j, line)| {
-            line.iter()
-                .enumerate()
-                .filter(|(_, &tile)| tile == 0)
-                .map(move |(i, _)| (i, j))
-        })
-        .flatten();
+    let trailheads = map.iter().enumerate().flat_map(|(j, line)| {
+        line.iter()
+            .enumerate()
+            .filter(|(_, &tile)| tile == 0)
+            .map(move |(i, _)| (i, j))
+    });
     let mut total_score = 0usize;
     for trailhead in trailheads {
         let mut height = 0;
@@ -68,8 +64,7 @@ fn part1() {
         while height < 9 {
             trails = trails
                 .into_iter()
-                .map(|tile| find_neighbors(&map, tile, height + 1))
-                .flatten()
+                .flat_map(|tile| find_neighbors(&map, tile, height + 1))
                 .collect();
             height += 1;
         }
@@ -87,16 +82,12 @@ fn part2() {
                 .collect()
         })
         .collect();
-    let trailheads = map
-        .iter()
-        .enumerate()
-        .map(|(j, line)| {
-            line.iter()
-                .enumerate()
-                .filter(|(_, &tile)| tile == 0)
-                .map(move |(i, _)| (i, j))
-        })
-        .flatten();
+    let trailheads = map.iter().enumerate().flat_map(|(j, line)| {
+        line.iter()
+            .enumerate()
+            .filter(|(_, &tile)| tile == 0)
+            .map(move |(i, _)| (i, j))
+    });
     let mut total_rating = 0usize;
     for trailhead in trailheads {
         let mut height = 0;

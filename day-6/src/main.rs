@@ -27,7 +27,7 @@ impl Direction {
         }
     }
 
-    fn is_leaving(&self, position: &(usize, usize), map: &Vec<Vec<Space>>) -> bool {
+    fn is_leaving(&self, position: &(usize, usize), map: &[Vec<Space>]) -> bool {
         match self {
             Direction::North => position.1 == 0,
             Direction::East => position.0 == map[0].len() - 1,
@@ -36,7 +36,7 @@ impl Direction {
         }
     }
 
-    fn peek_next(&self, position: &(usize, usize), map: &Vec<Vec<Space>>) -> Option<Space> {
+    fn peek_next(&self, position: &(usize, usize), map: &[Vec<Space>]) -> Option<Space> {
         match self {
             Direction::North => map
                 .get(position.1 - 1)
@@ -56,7 +56,7 @@ impl Direction {
     fn get_next_position(
         &self,
         position: &(usize, usize),
-        map: &Vec<Vec<Space>>,
+        map: &[Vec<Space>],
     ) -> Option<(usize, usize)> {
         if self.is_leaving(position, map) {
             return None;
@@ -69,12 +69,12 @@ impl Direction {
         }
     }
 
-    fn move_to(&self, position: &mut (usize, usize), map: &mut Vec<Vec<Space>>) {
-        *position = self.get_next_position(&position, &map).unwrap();
+    fn move_to(&self, position: &mut (usize, usize), map: &mut [Vec<Space>]) {
+        *position = self.get_next_position(position, map).unwrap();
         map[position.1][position.0] = Space::Path;
     }
 
-    fn step(&self, position: &mut (usize, usize), map: &mut Vec<Vec<Space>>) -> Option<Self> {
+    fn step(&self, position: &mut (usize, usize), map: &mut [Vec<Space>]) -> Option<Self> {
         if self.is_leaving(position, map) {
             None
         } else if self.peek_next(position, map).unwrap() == Space::Obstacle {
@@ -106,11 +106,8 @@ fn part1() {
         })
         .collect();
     let mut direction = Direction::North;
-    loop {
-        match direction.step(&mut position, &mut map) {
-            Some(dir) => direction = dir,
-            None => break,
-        }
+    while let Some(dir) = direction.step(&mut position, &mut map) {
+        direction = dir;
     }
     let positions = map
         .into_iter()
@@ -146,10 +143,7 @@ fn part2() {
         // Add one obstruction in front of the guard and check for loops
         if let Some(next_position) = direction.get_next_position(&position, &map) {
             if map[next_position.1][next_position.0] == Space::Empty {
-                let mut map_2: Vec<Vec<Space>> = map
-                    .iter()
-                    .map(|line| line.iter().cloned().collect())
-                    .collect();
+                let mut map_2: Vec<Vec<Space>> = map.iter().map(|line| line.to_vec()).collect();
                 let mut position_2 = position;
                 let mut direction_2 = direction;
                 let mut corners_2 = corners.clone();

@@ -8,7 +8,7 @@ static INPUT: &str = include_str!("./input.txt");
 #[derive(Debug, PartialEq, Eq, Hash, Clone, Copy)]
 struct Position(isize, isize);
 
-impl Sub for Position {
+impl Sub for &Position {
     type Output = Position;
 
     fn sub(self, rhs: Self) -> Self::Output {
@@ -16,7 +16,7 @@ impl Sub for Position {
     }
 }
 
-impl Add for Position {
+impl Add for &Position {
     type Output = Position;
 
     fn add(self, rhs: Self) -> Self::Output {
@@ -48,10 +48,9 @@ fn part1() {
     for antenna_set in nodes.values() {
         for a1 in 0..(antenna_set.len() - 1) {
             let antenna_1 = antenna_set[a1];
-            for a2 in (a1 + 1)..antenna_set.len() {
-                let antenna_2 = antenna_set[a2];
-                let diff = antenna_1 - antenna_2;
-                let antinode = antenna_1 + diff;
+            for antenna_2 in antenna_set.iter().skip(a1 + 1) {
+                let diff = &antenna_1 - antenna_2;
+                let antinode = &antenna_1 + &diff;
                 if antinode.0 >= 0
                     && antinode.0 < width as isize
                     && antinode.1 >= 0
@@ -59,7 +58,7 @@ fn part1() {
                 {
                     antinodes.insert(antinode);
                 }
-                let antinode = antenna_2 - diff;
+                let antinode = antenna_2 - &diff;
                 if antinode.0 >= 0
                     && antinode.0 < width as isize
                     && antinode.1 >= 0
@@ -100,9 +99,8 @@ fn part2() {
     for antenna_set in nodes.values() {
         for a1 in 0..(antenna_set.len() - 1) {
             let antenna_1 = antenna_set[a1];
-            for a2 in (a1 + 1)..antenna_set.len() {
-                let antenna_2 = antenna_set[a2];
-                let diff = antenna_1 - antenna_2;
+            for antenna_2 in antenna_set.iter().skip(a1 + 1) {
+                let diff = &antenna_1 - antenna_2;
                 // let gcd = num::integer::gcd(diff.0, diff.1);
                 // let diff = Position(diff.0 / gcd, diff.0 / gcd);
                 let mut antinode = antenna_1;
@@ -112,16 +110,16 @@ fn part2() {
                     && antinode.1 < height as isize
                 {
                     antinodes.insert(antinode);
-                    antinode = antinode + diff;
+                    antinode = &antinode + &diff;
                 }
-                let mut antinode = antenna_2;
+                let mut antinode = *antenna_2;
                 while antinode.0 >= 0
                     && antinode.0 < width as isize
                     && antinode.1 >= 0
                     && antinode.1 < height as isize
                 {
                     antinodes.insert(antinode);
-                    antinode = antinode - diff;
+                    antinode = &antinode - &diff;
                 }
                 // let mut antinode = antenna_1 - diff;
                 // while antinode != antenna_2 {

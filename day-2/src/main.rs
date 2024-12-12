@@ -13,7 +13,7 @@ fn is_safe(report: &[isize], can_dampen: bool) -> bool {
             return false;
         };
         match second - first {
-            1 | 2 | 3 => {
+            1..=3 => {
                 if orientation == Some(Orientation::Decreasing) {
                     if can_dampen {
                         if index == 1 {
@@ -41,7 +41,7 @@ fn is_safe(report: &[isize], can_dampen: bool) -> bool {
                 }
                 orientation = Some(Orientation::Increasing);
             }
-            -1 | -2 | -3 => {
+            -3..=-1 => {
                 if orientation == Some(Orientation::Increasing) {
                     if can_dampen {
                         if index == 1 {
